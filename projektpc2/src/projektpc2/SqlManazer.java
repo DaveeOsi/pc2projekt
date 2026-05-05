@@ -8,7 +8,10 @@ public class SqlManazer {
     private static final String URL = "jdbc:sqlite:firma.db";
 
     public void vytvorTabulku() {
-        String sql = "CREATE TABLE IF NOT EXISTS zamestnanci (id INTEGER PRIMARY KEY, jmeno TEXT, prijmeni TEXT, rok INTEGER, typ TEXT)";
+        
+        String sql = "CREATE TABLE IF NOT EXISTS zamestnanci (" +
+                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " + 
+                     "jmeno TEXT, prijmeni TEXT, rok INTEGER, typ TEXT)";
         try (Connection conn = DriverManager.getConnection(URL); Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
         } catch (SQLException e) {
@@ -22,18 +25,19 @@ public class SqlManazer {
             Statement stmt = conn.createStatement();
             stmt.execute("DELETE FROM zamestnanci"); 
 
-            String insert = "INSERT INTO zamestnanci (id, jmeno, prijmeni, rok, typ) VALUES (?, ?, ?, ?, ?)";
+            
+            String insert = "INSERT INTO zamestnanci (jmeno, prijmeni, rok, typ) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(insert);
 
             for (Zamestnanec z : databaze.values()) {
-                pstmt.setInt(1, z.getId());
-                pstmt.setString(2, z.getJmeno());
-                pstmt.setString(3, z.getPrijmeni());
-                pstmt.setInt(4, z.getRokNarozeni());
-                pstmt.setString(5, z.getSkupina());
+                
+                pstmt.setString(1, z.getJmeno());
+                pstmt.setString(2, z.getPrijmeni());
+                pstmt.setInt(3, z.getRokNarozeni());
+                pstmt.setString(4, z.getSkupina());
                 pstmt.executeUpdate();
             }
-            System.out.println("Záloha do SQL úspěšná.");
+            System.out.println("Záloha do SQL úspěšná (ID vygenerována automaticky).");
         } catch (SQLException e) {
             System.out.println("Chyba SQL zápisu: " + e.getMessage());
         }
@@ -47,7 +51,7 @@ public class SqlManazer {
              ResultSet rs = stmt.executeQuery("SELECT * FROM zamestnanci")) {
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("id"); 
                 String jm = rs.getString("jmeno");
                 String pr = rs.getString("prijmeni");
                 int rok = rs.getInt("rok");
